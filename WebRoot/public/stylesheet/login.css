@@ -1,0 +1,114 @@
+@font-face {
+    font-family: fz;
+    src: url('public/font/fzchyjt.ttf');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#msgBar {
+    position: fixed;
+    top: -50px;
+    width: 100%;
+    height: 50px;
+    -webkit-box-shadow: 0 0 10px rgba(51, 51, 51, 0.84);
+    text-align: center;
+    font-size: 1.3em;
+    line-height: 2em;
+    color: #FFFFFF;
+}
+
+#logo {
+    -webkit-user-select: none;
+    color: rgba(0, 102, 204, 0.5);
+    font-size: 3em;
+    padding: 44px 0;
+    text-align: center;
+    font-family: fz;
+}
+
+#content {
+    position: absolute;
+    top: 27%;
+    left: calc(50% - 125px);
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.14);
+    border-radius: 0.8em;
+    -webkit-box-shadow: 0 0 10px rgba(51, 51, 51, .83);
+    text-align: center;
+}
+
+.form-group {
+    position: relative;
+}
+
+input {
+    margin-top: 10px;
+    height: 40px;
+    width: 250px;
+    outline: none;
+    font-size: 1em;
+    position: relative;
+    z-index: 1;
+    border-bottom: 1px solid silver;
+    background-color: transparent;
+}
+
+label {
+    -webkit-user-select: none;
+    position: absolute;
+    top: 20px;
+    color: #999;
+    transition: color .5s;
+}
+
+#submit {
+    width: 100%;
+    height: 40px;
+    border-radius: 1.3em;
+    border: 1px solid #0066cc;
+    outline: none;
+    margin-top: 30px;
+    font-size: 1em;
+    background-color: transparent;
+    color: #0066cc;
+}
+
+#submit:hover {
+    background-color: #0066cc;
+    color: #FFFFFF;
+    border-color: #FFFFFF;
+    cursor: pointer;
+}
+
+#span {
+    line-height: 30px;
+    color: #999;
+}
+
+#span a {
+    text-decoration: none;
+    color: #999;
+}
+
+#span a:hover {
+    color: #0066cc;
+
+}
+
+svg {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+}
