@@ -3,8 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <title>主页</title>
+    <link href="public/stylesheet/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="public/stylesheet/ctrl-btn.css"/>
+    <link rel="stylesheet" href="public/stylesheet/index.css"/>
+
 </head>
 <body>
+<section id="msgBar"></section>
+<header>
+    <section id="logo">TaMusic</section>
+    <section id="user">
+        <ul>
+            <li>
+                <svg>
+                    <use xlink:href="public/font/icon.svg#iconfont-person2"/>
+                </svg>
+                <span>馒头上线了</span>
+            </li>
+            <li>
+                <svg>
+                    <use xlink:href="public/font/icon.svg#iconfont-history"/>
+                </svg>
+                <span>172342</span>
+            </li>
+            <li>
+                <svg>
+                    <use xlink:href="public/font/icon.svg#iconfont-like"/>
+                </svg>
+                <span>725</span>
+            </li>
+            <li>
+                <svg>
+                    <use xlink:href="public/font/icon.svg#iconfont-delete"/>
+                </svg>
+                <span>348</span>
+            </li>
+        </ul>
+    </section>
+</header>
+<article>
+    <div class="lrc">
+        <ul></ul>
+    </div>
+    <div class="panel">
+        <i class="fa fa-chevron-left"></i>
+    </div>
+</article>
+<footer>
+    <section id="ctrl">
+        <div class="btn">
+            <button class="cbutton cbutton--effect-ivana">
+                <i class="cbutton__icon fa fa-fw fa-step-backward"></i>
+            </button>
+        </div>
+        <div id="play" class="btn btn--play-pause playing">
+            <svg viewbox="0 0 40 40" class="btn__icon">
+                <circle cx="20" cy="20" r="19" transform="rotate(-90 20 20)"
+                        class="icon__shape icon__shape--circle icon__shape--orange"></circle>
+                <circle cx="20" cy="20" r="19" transform="rotate(-90 20 20)"
+                        class="icon__shape icon__shape--circle icon__shape--white"></circle>
+                <polygon points="16,14 16,26 27.5,19.8" class="icon__shape icon__shape--triangle"></polygon>
+                <line x1="24" y1="14" x2="24" y2="26" class="icon__shape icon__shape--line"></line>
+            </svg>
+            <div class="btn__shadow"></div>
+        </div>
+        <div class="btn">
+            <button class="cbutton cbutton--effect-ivana">
+                <i class="cbutton__icon fa fa-fw fa-step-forward"></i>
+            </button>
+        </div>
+        <div class="btn btn--volume btn--volume-2">
+            <svg viewbox="0 0 174 40" class="btn__icon">
+                <path d="M2.8,20.4c0-17.4,19-19,19-19v38C21.8,39.4,2.8,37.8,2.8,20.4z" class="icon__shape"></path>
+                <line x1="26" y1="7.9" x2="1" y2="32.9"
+                      class="icon__shape icon__shape--line-mute icon__shape--orange"></line>
+                <line x1="26" y1="7.9" x2="1" y2="32.9"
+                      class="icon__shape icon__shape--line-mute icon__shape--white"></line>
+                <line x1="37.8" y1="20" x2="162.8" y2="20"
+                      class="icon__shape icon__shape--line-controls icon__shape--translucide"></line>
+                <line x1="37.8" y1="20" x2="162.8" y2="20"
+                      class="icon__shape icon__shape--line-controls icon__shape--white"></line>
+                <circle cx="24.8" cy="20" r="19" transform="rotate(45 25 20)"
+                        class="icon__shape icon__shape--circle-big icon__shape--translucide"></circle>
+                <circle cx="24.8" cy="20" r="13" transform="rotate(-45 25 20)"
+                        class="icon__shape icon__shape--circle-medium icon__shape--translucide"></circle>
+                <circle cx="24.8" cy="20" r="7" transform="rotate(-45 25 20)"
+                        class="icon__shape icon__shape--circle-small icon__shape--translucide"></circle>
+                <circle cx="37.8" cy="20" r="0" class="icon__shape icon__shape--circle-controls"></circle>
+                <circle cx="37.8" cy="20" r="1" class="icon__shape icon__shape--circle-placeholder"></circle>
+            </svg>
+            <div class="btn__shadow"></div>
+        </div>
+    </section>
+    <section id="bar">
+        <div class="progress"></div>
+        <span class="progress-text"></span>
+    </section>
+    <section id="setting"></section>
+</footer>
+<script src="public/javascript/jquery.min.js"></script>
+<script src="public/javascript/velocity.min.js"></script>
+<script src='public/javascript/hammer.js'></script>
+<script src='public/javascript/TweenMax.min.js'></script>
 
+<script>
+    var audio = document.createElement('audio');//设置全局audio
+    $.ajax({
+        type: 'get',
+        url: 'nswdy.lrc',
+        dataType: 'text',
+        success: function (data) {
+            var lrc = Parser(data);//解析lrc
+            initLrc(lrc);//将lrc填充到网页
+            loadAudio(data);//创建音频文件，填充到页面
+            var lastI = -1, lastTime = 0;
+            audio.ontimeupdate = function () {
+                //设置进度条
+                $('.progress').css('width', (this.currentTime / this.duration) * 100 + '%');
+                //设置结束时间
+                $('.progress-text').text('-' + parseInt((this.duration - this.currentTime) / 60) + ':' + parseInt((this.duration - this.currentTime) % 60));
+                for (var i = 0; i < lrc.length; i++) {
+//                    if (this.currentTime * 1000 < lrc[i].time + 1300 || i == lrc.length - 1 || (this.currentTime * 1000 > lrc[i].time + 1300 && this.currentTime * 1000 < lrc[i + 1].time + 1300)) {
+//                        break;
+//                    }
+                    if (this.currentTime * 1000 < lrc[i].time + 1300) {
+                        break;
+                    }
+                    if (lastI < i) {
+                        //歌词变色
+                        $('.lrc ul li').removeClass('current');
+                        $('#li_' + i).addClass('current');
+                        //滚
+                        $('.lrc ul').animate({top: 350 - 35 * i + 'px'}, 0);
+                        lastI = i;
+                    }
+                }
+                if (lastTime > this.currentTime) {
+                    lastI = 0;
+                }
+                lastTime = this.currentTime;
+            };
+        }
+    });
+    //设置暂停播放按钮
+    $('#play').on('click', function () {
+        if ($(this).hasClass("playing")) {
+            audio.pause();
+            $(this).removeClass("playing");
+        } else {
+            audio.play();
+            $(this).addClass("playing");
+        }
+    });
+
+    //设置播放位置
+    $('#bar').on('mousedown', function (e) {
+        $(this).on('mousemove', function (e2) {
+            $('.progress').css('width', e2.offsetX + 'px');
+            audio.currentTime = (e2.offsetX / $(this).width()) * audio.duration;
+        });
+
+        $(this).on('mouseup', function (e3) {
+            $(this).unbind('mousemove');
+            $('.progress').css('width', e3.offsetX + 'px');
+            audio.currentTime = (e3.offsetX / $(this).width()) * audio.duration;
+        })
+    });
+
+    function loadAudio(data) {
+
+        audio.setAttribute('src', 'http://localhost:8080/你是我的眼.mp3');
+        audio.setAttribute('autoplay', 'autoplay');
+        $('#process').append(audio);
+
+    }
+    function initLrc(lrc) {
+        for (var i = 0; i < lrc.length; i++) {
+            $('.lrc ul').append('<li id="li_' + i + '">' + lrc[i].txt + '</li>')
+        }
+        $('#li_0').addClass('current');
+    }
+    function Parser(lrc) {
+        var timeExp = /\[(\d{2,})\:(\d{2})(?:\.(\d{2,3}))?\]/g;
+
+        lrc = trim(lrc);
+        this.lrc = lrc;//lrc 歌词
+        this.lines = [];//解析结果
+        var line, time, lines = lrc.split(/\n/)
+                , _last;
+
+        timeExp.lastIndex = 0;
+        for (var i = 0, l = lines.length; i < l; i++) {
+            while (time = timeExp.exec(lines[i])) {
+                _last = timeExp.lastIndex;
+                line = trim(lines[i].replace(timeExp, ''));
+                timeExp.lastIndex = _last;
+                if (time[3].length == 2)
+                    this.lines.push({
+                        time: time[1] * 60 * 1000 + time[2] * 1000 + (time[3] || 0) * 10
+                        , originLineNum: i
+                        , txt: line
+                    });
+                else this.lines.push({
+                    time: time[1] * 60 * 1000 + time[2] * 1000 + (time[3] || 0) * 1
+                    , originLineNum: i
+                    , txt: line
+                });
+            }
+        }
+        this.lines.sort(function (a, b) {
+            return a.time - b.time;
+        });
+
+
+        return this.lines;
+    }
+    function trim(lrc) {
+        return lrc.replace(/(^\s*|\s*$)/m, '')
+    }
+    $('.cbutton').on('click', function () {
+        $(this).css('border-color', '#3c8ddc').css('color', '#3c8ddc').addClass('cbutton--click');
+        setTimeout(function () {
+            $('.cbutton').css('border-color', '#fff').css('color', '#fff').removeClass('cbutton--click');
+        }, 1100)
+    });
+</script>
+<script src="public/javascript/ctrl-btn.js"></script>
 </body>
 </html>

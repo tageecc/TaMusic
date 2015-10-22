@@ -2,4 +2,7 @@
 /.idea
 /target
 /WebRoot/public/bower_components
+/WebRoot/public/node_modules
 *.mp4
+*.scss
+*.map

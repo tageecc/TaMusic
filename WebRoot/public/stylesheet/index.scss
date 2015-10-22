@@ -1,0 +1,161 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+li, ul {
+  list-style: none;
+}
+
+@font-face {
+  font-family: fz;
+  src: url('../font/fzchyjt.ttf');
+}
+
+body {
+  background: url("../image/bg2.jpg") no-repeat;
+}
+
+header {
+  width: 100%;
+  height: 50px;
+  position: absolute;
+  top: 0;
+  #logo {
+    -webkit-user-select: none;
+    color: rgba(0, 102, 204, 0.5);
+    font: {
+      size: 2em;
+      family: fz;
+    }
+    position: absolute;
+    left: 20px;
+    top: 12px;
+  }
+  #user {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    li {
+      float: left;
+      margin-left: 10px;
+      color: #e5e5e5;
+      svg {
+        width: 1.5em;
+        height: 1.5em;
+        position: relative;
+        top: 4px;
+        left: 4px;
+        fill: rgba(0, 102, 204, 0.9);
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+article {
+  .lrc {
+    width: 550px;
+    height: 80%;
+    overflow: hidden;
+    position: absolute;
+    left: calc(50% - 460px);
+    bottom: 100px;
+    ul {
+      top: 300px;
+      position: absolute;
+      transition: all 0.5s ease;
+      li {
+        font-size: 1.4em;
+        height: 25px;
+        margin-top: 10px;
+        position: relative;
+        color: darkgray;
+      }
+    }
+    .current {
+      color: #0088cc;
+    }
+  }
+  .panel {
+    -webkit-user-select: none;
+    position: absolute;
+    width: 115px;
+    height: 275px;
+    display: block;
+    top: calc(50% - 75px);
+    margin-top: -137.5px;
+    z-index: 9999;
+    color: #fff;
+    font-size: 24px;
+    line-height: 275px;
+    text-decoration: none;
+    transition: all 0.25s;
+    border-radius: 5px;
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.35);
+      .fa-chevron-left {
+        margin-left: 30px;
+      }
+    }
+    .fa-chevron-left {
+      position: relative;
+      font-size: 55px;
+      color: darkgray;
+      transition: all 0.45s;
+    }
+  }
+}
+
+footer {
+  width: 100%;
+  min-width: 1000px;
+  height: 100px;
+  background-color: rgba(0, 0, 0, 0.53);
+  -webkit-box-shadow: 0 0 10px rgba(51, 51, 51, 0.84);
+  position: absolute;
+  bottom: 0;
+  section {
+    float: left;
+  }
+  #ctrl {
+    height: 100%;
+    width: 380px;
+    position: relative;
+    left: 25px;
+    -webkit-user-select: none;
+  }
+  #bar {
+    width: calc(100% - 380px);
+    height: 100px;
+    overflow: hidden;
+    cursor: pointer;
+    .progress {
+      width: 100%;
+      height: 100px;
+      background-image: linear-gradient(120deg, rgba(0, 102, 204, 0.51), rgba(0, 204, 102, 0.51));
+      position: relative;
+      &:before, &:after {
+        content: "";
+        position: absolute;
+        right: -1px;
+        top: -10px;
+        width: 1px;
+        height: 120px;
+      }
+      &:before {
+        width: 7px;
+        right: -4px;
+        background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 75%);
+      }
+    }
+    .progress-text {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      color: rgba(242, 248, 255, 0.53);
+    }
+  }
+}

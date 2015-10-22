@@ -1,6 +1,6 @@
 @font-face {
     font-family: fz;
-    src: url('public/font/fzchyjt.ttf');
+    src: url('../font/fzchyjt.ttf');
 }
 
 * {

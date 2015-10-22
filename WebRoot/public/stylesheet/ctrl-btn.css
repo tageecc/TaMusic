@@ -1,0 +1,262 @@
+* {
+    box-sizing: border-box;
+}
+
+.menu__inner {
+    left: 0;
+    margin-top: -20px;
+    padding: 0 40px;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+}
+
+.menu__credits {
+    color: #333333;
+    float: right;
+    font-size: 14px;
+    letter-spacing: 1px;
+    line-height: 40px;
+}
+
+.menu__link {
+    color: #ffffff;
+    display: inline-block;
+    position: relative;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.menu__link:after {
+    background-color: #ffffff;
+    content: '';
+    height: 2px;
+    left: 0;
+    margin-top: 10px;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    -webkit-transition: -webkit-transform 500ms cubic-bezier(0.19, 1, 0.22, 1);
+    transition: transform 500ms cubic-bezier(0.19, 1, 0.22, 1);
+    -webkit-transform-origin: left center;
+    -ms-transform-origin: left center;
+    transform-origin: left center;
+    -webkit-transform: scaleX(0);
+    -ms-transform: scaleX(0);
+    transform: scaleX(0);
+}
+
+.menu__link:hover:after {
+    -webkit-transform: scaleX(1);
+    -ms-transform: scaleX(1);
+    transform: scaleX(1);
+}
+
+.btn {
+    float: left;
+    margin-right: 20px;
+    top: 31px;
+    position: relative;
+}
+.cbutton,.btn:not(.btn--volume){
+    cursor: pointer;
+}
+
+.btn .btn__icon {
+    height: 40px;
+}
+
+.btn .btn__shadow {
+    background-color: #ffffff;
+    border-radius: 50%;
+    left: -15px;
+    height: 70px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: -15px;
+    width: 70px;
+}
+
+.btn .btn__icon .icon__shape {
+    fill: none;
+    stroke: #ffffff;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.btn .btn__icon .icon__shape--translucide {
+    opacity: 0.2;
+}
+
+.btn .btn__icon .icon__shape--orange {
+    stroke: #ffa700;
+}
+
+.btn--play-pause .btn__icon .icon__shape--circle {
+    height: 40px;
+    stroke-dasharray: 119.38052 119.38052;
+    width: 40px;
+}
+
+.btn--play-pause .btn__icon .icon__shape--line {
+    stroke-dasharray: 12 12;
+}
+
+.btn--play-pause .btn__icon .icon__shape--triangle {
+    stroke-dasharray: 12 38;
+}
+
+.btn--volume .btn__shadow {
+    left: -12px;
+}
+
+.btn--volume .btn__icon .icon__shape--line-mute {
+    stroke-dasharray: 35.3553 70.71067;
+    stroke-dashoffset: 35.3553;
+}
+
+.btn--volume .btn__icon .icon__shape--line-controls {
+    stroke-dasharray: 125 250;
+    stroke-dashoffset: 125;
+}
+
+.btn--volume .btn__icon .icon__shape--circle-small {
+    opacity: 1;
+    stroke-dasharray: 10.99557 87.96459;
+}
+
+.btn--volume .btn__icon .icon__shape--circle-medium {
+    opacity: 1;
+    stroke-dasharray: 20.42035 163.36281;
+}
+
+.btn--volume .btn__icon .icon__shape--circle-big {
+    stroke-dasharray: 29.84513 238.76104;
+    stroke-dashoffset: -89.53539;
+}
+
+.btn--volume .btn__icon .icon__shape--circle-controls {
+    cursor: pointer;
+    display: block;
+    fill: #ffffff;
+    opacity: 0.2;
+    stroke: none;
+}
+
+.btn--volume .btn__icon .icon__shape--circle-placeholder {
+    fill: #ffffff;
+    opacity: 0;
+    stroke: none;
+}
+
+.cbutton {
+    padding: 0;
+    background: none;
+    color: rgba(255, 255, 255, 0.81);
+    font-size: 1.4em;
+    border-radius: 50%;
+    border: 2px solid white;
+    transition: all 0.7s;
+    width: 40px;
+    height: 40px;
+}
+
+.cbutton.cbutton--click,
+.cbutton:focus {
+    outline: none;
+}
+.cbutton::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -35px 0 0 -35px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Ivana */
+.cbutton--effect-ivana::before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -35px 0 0 -35px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    content: '';
+    opacity: 0;
+    pointer-events: none;
+}
+
+.cbutton--effect-ivana::before,
+.cbutton--effect-ivana::after {
+    box-shadow: 0 0 0 2px rgba(111, 148, 182, 0.5);
+}
+
+.cbutton--effect-ivana.cbutton--click::before {
+    -webkit-animation: anim-effect-ivana-1 0.5s forwards;
+    animation: anim-effect-ivana-1 0.5s forwards;
+}
+
+.cbutton--effect-ivana.cbutton--click::after {
+    -webkit-animation: anim-effect-ivana-2 0.5s forwards;
+    animation: anim-effect-ivana-2 0.5s forwards;
+}
+
+@-webkit-keyframes anim-effect-ivana-1 {
+    0% {
+        opacity: 1;
+        -webkit-transform: scale3d(0.5, 0.5, 1);
+        transform: scale3d(0.5, 0.5, 1);
+    }
+    100% {
+        opacity: 0;
+        -webkit-transform: scale3d(1.1, 1.1, 1);
+        transform: scale3d(1.1, 1.1, 1);
+    }
+}
+
+@keyframes anim-effect-ivana-1 {
+    0% {
+        opacity: 1;
+        -webkit-transform: scale3d(0.5, 0.5, 1);
+        transform: scale3d(0.5, 0.5, 1);
+    }
+    100% {
+        opacity: 0;
+        -webkit-transform: scale3d(1.1, 1.1, 1);
+        transform: scale3d(1.1, 1.1, 1);
+    }
+}
+
+@-webkit-keyframes anim-effect-ivana-2 {
+    0% {
+        opacity: 1;
+        -webkit-transform: scale3d(0.5, 0.5, 1);
+        transform: scale3d(0.5, 0.5, 1);
+    }
+    50%, 100% {
+        opacity: 0;
+        -webkit-transform: scale3d(1.2, 1.2, 1);
+        transform: scale3d(1.2, 1.2, 1);
+    }
+}
+
+@keyframes anim-effect-ivana-2 {
+    0% {
+        opacity: 1;
+        -webkit-transform: scale3d(0.5, 0.5, 1);
+        transform: scale3d(0.5, 0.5, 1);
+    }
+    50%, 100% {
+        opacity: 0;
+        -webkit-transform: scale3d(1.2, 1.2, 1);
+        transform: scale3d(1.2, 1.2, 1);
+    }
+}
