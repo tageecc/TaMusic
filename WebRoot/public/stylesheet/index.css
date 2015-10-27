@@ -6,6 +6,10 @@
 li, ul {
   list-style: none; }
 
+a {
+  color: #fff;
+  text-decoration: none; }
+
 @font-face {
   font-family: fz;
   src: url("../font/fzchyjt.ttf"); }
@@ -42,26 +46,26 @@ header {
         fill: rgba(0, 102, 204, 0.9);
         cursor: pointer; }
 
-article .lrc {
+#main article .lrc {
   width: 550px;
   height: 80%;
   overflow: hidden;
   position: absolute;
   left: calc(50% - 460px);
   bottom: 100px; }
-  article .lrc ul {
+  #main article .lrc ul {
     top: 300px;
     position: absolute;
     transition: all 0.5s ease; }
-    article .lrc ul li {
+    #main article .lrc ul li {
       font-size: 1.4em;
       height: 25px;
       margin-top: 10px;
       position: relative;
       color: darkgray; }
-  article .lrc .current {
+  #main article .lrc .current {
     color: #0088cc; }
-article .panel {
+#main article .panel-btn {
   -webkit-user-select: none;
   position: absolute;
   width: 115px;
@@ -77,15 +81,65 @@ article .panel {
   transition: all 0.25s;
   border-radius: 5px;
   cursor: pointer; }
-  article .panel:hover {
+  #main article .panel-btn:hover {
     background-color: rgba(255, 255, 255, 0.35); }
-    article .panel:hover .fa-chevron-left {
+    #main article .panel-btn:hover .fa-chevron-left {
       margin-left: 30px; }
-  article .panel .fa-chevron-left {
+  #main article .panel-btn .fa-chevron-left {
     position: relative;
     font-size: 55px;
     color: darkgray;
     transition: all 0.45s; }
+
+#panel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: -100%; }
+  #panel article {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    width: 980px;
+    height: calc(100% - 180px); }
+    #panel article ul {
+      margin-top: 30px;
+      display: block; }
+      #panel article ul li {
+        -webkit-user-select: none;
+        padding: 9px;
+        position: relative;
+        font-size: 16px;
+        margin-right: 45px;
+        margin-top: 40px;
+        width: 200px;
+        text-align: center;
+        color: #ffffff;
+        background-color: rgba(51, 153, 204, 0.35);
+        border-radius: 5px;
+        float: left;
+        cursor: pointer; }
+        #panel article ul li:hover {
+          background-color: rgba(51, 153, 204, 0.83); }
+        #panel article ul li i {
+          position: relative;
+          height: 50px;
+          font-size: 40px; }
+        #panel article ul li p {
+          height: 30px;
+          line-height: 30px; }
+        #panel article ul li span {
+          display: none;
+          width: 14px;
+          height: 11px;
+          position: absolute;
+          left: 45px;
+          bottom: 17px;
+          content: '';
+          margin-top: -5.5px;
+          background: url("../image/RfCqLoe9.gif") no-repeat; }
 
 footer {
   width: 100%;
@@ -95,19 +149,22 @@ footer {
   -webkit-box-shadow: 0 0 10px rgba(51, 51, 51, 0.84);
   position: absolute;
   bottom: 0; }
-  footer section {
-    float: left; }
   footer #ctrl {
     height: 100%;
-    width: 380px;
+    width: 350px;
     position: relative;
-    left: 25px;
     -webkit-user-select: none; }
   footer #bar {
-    width: calc(100% - 380px);
-    height: 100px;
+    width: 100%;
+    height: 10px;
     overflow: hidden;
-    cursor: pointer; }
+    cursor: pointer;
+    position: absolute;
+    bottom: 0;
+    transition: height 0.53s; }
+    footer #bar:hover {
+      height: 100px;
+      bottom: 0; }
     footer #bar .progress {
       width: 100%;
       height: 100px;

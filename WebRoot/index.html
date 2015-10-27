@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>ä¸»é¡µ</title>
+    <meta charset="GBK">
+    <title>Ö÷Ò³</title>
     <link href="public/stylesheet/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="public/stylesheet/ctrl-btn.css"/>
     <link rel="stylesheet" href="public/stylesheet/index.css"/>
@@ -18,7 +18,7 @@
                 <svg>
                     <use xlink:href="public/font/icon.svg#iconfont-person2"/>
                 </svg>
-                <span>é¦’å¤´ä¸Šçº¿äº†</span>
+                <span>ÂøÍ·ÉÏÏßÁË</span>
             </li>
             <li>
                 <svg>
@@ -41,18 +41,59 @@
         </ul>
     </section>
 </header>
-<article>
-    <div class="lrc">
-        <ul></ul>
-    </div>
-    <div class="panel">
-        <i class="fa fa-chevron-left"></i>
-    </div>
-</article>
+<section id="main">
+    <article>
+        <div class="lrc">
+            <ul></ul>
+        </div>
+        <div class="panel-btn">
+            <i class="fa fa-chevron-left"></i>
+        </div>
+    </article>
+</section>
+
+<section id="panel">
+    <article>
+        <ul>
+            <li><span class="gif"></span>
+                <i class="fa fa-user"></i>
+
+                <p>Ë½ÈËÆµµÀ</p>
+            </li>
+            <li><span class="gif"></span>
+                <i class="fa fa-heart"></i>
+
+                <p>ºìĞÄÆµµÀ</p>
+            </li>
+            <li><span class="gif" style="display: inline-block"></span>
+                <i class="fa fa-coffee"></i>
+
+                <p>Ëæ±ãÌıÌı</p>
+            </li>
+            <li><span class="gif"></span>
+                <i class="fa fa-area-chart"></i>
+
+                <p>ÈÈÃÅÆµµÀ</p>
+            </li>
+            <a href="upload.html" target="_blank">
+                <li>
+                    <i class="fa fa-cloud-upload"></i>
+
+                    <p>ÉÏ´«¸èÇú</p>
+                </li>
+            </a>
+        </ul>
+        <div style="clear: both;"></div>
+    </article>
+</section>
+
 <footer>
+    <section>
+        <img src="" alt=""/>
+    </section>
     <section id="ctrl">
         <div class="btn">
-            <button class="cbutton cbutton--effect-ivana">
+            <button onclick="play('song/previous')" class="cbutton cbutton--effect-ivana">
                 <i class="cbutton__icon fa fa-fw fa-step-backward"></i>
             </button>
         </div>
@@ -68,12 +109,12 @@
             <div class="btn__shadow"></div>
         </div>
         <div class="btn">
-            <button class="cbutton cbutton--effect-ivana">
+            <button onclick="play()" class="cbutton cbutton--effect-ivana">
                 <i class="cbutton__icon fa fa-fw fa-step-forward"></i>
             </button>
         </div>
         <div class="btn btn--volume btn--volume-2">
-            <svg viewbox="0 0 174 40" class="btn__icon">
+            <svg viewbox="0 0 174 40" class="btn__icon" style="height: 33px;">
                 <path d="M2.8,20.4c0-17.4,19-19,19-19v38C21.8,39.4,2.8,37.8,2.8,20.4z" class="icon__shape"></path>
                 <line x1="26" y1="7.9" x2="1" y2="32.9"
                       class="icon__shape icon__shape--line-mute icon__shape--orange"></line>
@@ -107,45 +148,65 @@
 <script src='public/javascript/TweenMax.min.js'></script>
 
 <script>
-    var audio = document.createElement('audio');//è®¾ç½®å…¨å±€audio
-    $.ajax({
-        type: 'get',
-        url: 'nswdy.lrc',
-        dataType: 'text',
-        success: function (data) {
-            var lrc = Parser(data);//è§£ælrc
-            initLrc(lrc);//å°†lrcå¡«å……åˆ°ç½‘é¡µ
-            loadAudio(data);//åˆ›å»ºéŸ³é¢‘æ–‡ä»¶ï¼Œå¡«å……åˆ°é¡µé¢
-            var lastI = -1, lastTime = 0;
-            audio.ontimeupdate = function () {
-                //è®¾ç½®è¿›åº¦æ¡
-                $('.progress').css('width', (this.currentTime / this.duration) * 100 + '%');
-                //è®¾ç½®ç»“æŸæ—¶é—´
-                $('.progress-text').text('-' + parseInt((this.duration - this.currentTime) / 60) + ':' + parseInt((this.duration - this.currentTime) % 60));
-                for (var i = 0; i < lrc.length; i++) {
-//                    if (this.currentTime * 1000 < lrc[i].time + 1300 || i == lrc.length - 1 || (this.currentTime * 1000 > lrc[i].time + 1300 && this.currentTime * 1000 < lrc[i + 1].time + 1300)) {
-//                        break;
-//                    }
-                    if (this.currentTime * 1000 < lrc[i].time + 1300) {
-                        break;
+    var playlist = [];
+    var audio = document.createElement('audio');//ÉèÖÃÈ«¾Öaudio
+    $(document).ready(play('song/play'));
+
+    function play(url) {
+        $.ajax({
+            type: 'get',
+            url: url,
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                playlist.push(data.song.songid);//±£´æ¸èÇúÁĞ±í
+                if (data.status) {
+                    if (data.lrc) {//ÅĞ¶ÏsrcÊÇ·ñ´æÔÚ
+                        var lrc = Parser(data);//½âÎölrc
+                        initLrc(lrc);//½«lrcÌî³äµ½ÍøÒ³
+                    } else {
+                        $('.lrc ul').html('<li>ÔİÎŞ¸è´Ê</li>')
                     }
-                    if (lastI < i) {
-                        //æ­Œè¯å˜è‰²
-                        $('.lrc ul li').removeClass('current');
-                        $('#li_' + i).addClass('current');
-                        //æ»š
-                        $('.lrc ul').animate({top: 350 - 35 * i + 'px'}, 0);
-                        lastI = i;
-                    }
+                    loadAudio(data.song);//´´½¨ÒôÆµÎÄ¼ş£¬Ìî³äµ½Ò³Ãæ
+                    var lastI = -1, lastTime = 0;
+                    audio.ontimeupdate = function () {
+                        //ÉèÖÃ½ø¶ÈÌõ
+                        $('.progress').css('width', (this.currentTime / this.duration) * 100 + '%');
+                        //ÉèÖÃ½áÊøÊ±¼ä
+                        $('.progress-text').text('-' + parseInt((this.duration - this.currentTime) / 60) + ':' + parseInt((this.duration - this.currentTime) % 60));
+                        //Èô¸è´Ê´æÔÚ
+                        if (data.lrc) {
+                            for (var i = 0; i < lrc.length; i++) {
+                                if (this.currentTime * 1000 < lrc[i].time + 1300) {
+                                    break;
+                                }
+                                if (lastI < i) {
+                                    //¸è´Ê±äÉ«
+                                    $('.lrc ul li').removeClass('current');
+                                    $('#li_' + i).addClass('current');
+                                    //¹ö
+                                    $('.lrc ul').animate({top: 350 - 35 * i + 'px'}, 0);
+                                    lastI = i;
+                                }
+                            }
+                            if (lastTime > this.currentTime) {
+                                lastI = 0;
+                            }
+                            lastTime = this.currentTime;
+                        }
+                    };
+                    //¸èÇú²¥·ÅÍê±Ï
+                    audio.addEventListener('ended', function () {
+                        play('song/play');
+                    }, false);
+
                 }
-                if (lastTime > this.currentTime) {
-                    lastI = 0;
-                }
-                lastTime = this.currentTime;
-            };
-        }
-    });
-    //è®¾ç½®æš‚åœæ’­æ”¾æŒ‰é’®
+
+            }
+        });
+    }
+
+    //ÉèÖÃÔİÍ£²¥·Å°´Å¥
     $('#play').on('click', function () {
         if ($(this).hasClass("playing")) {
             audio.pause();
@@ -156,7 +217,7 @@
         }
     });
 
-    //è®¾ç½®æ’­æ”¾ä½ç½®
+    //ÉèÖÃ²¥·ÅÎ»ÖÃ
     $('#bar').on('mousedown', function (e) {
         $(this).on('mousemove', function (e2) {
             $('.progress').css('width', e2.offsetX + 'px');
@@ -170,16 +231,16 @@
         })
     });
 
-    function loadAudio(data) {
+    function loadAudio(song) {
 
-        audio.setAttribute('src', 'http://localhost:8080/ä½ æ˜¯æˆ‘çš„çœ¼.mp3');
-        audio.setAttribute('autoplay', 'autoplay');
+        audio.setAttribute('src', song.src);
+        audio.play();
         $('#process').append(audio);
 
     }
     function initLrc(lrc) {
         for (var i = 0; i < lrc.length; i++) {
-            $('.lrc ul').append('<li id="li_' + i + '">' + lrc[i].txt + '</li>')
+            $('.lrc ul').append('<li id="li_' + i + '">' + lrc[i].txt + '</li>');
         }
         $('#li_0').addClass('current');
     }
@@ -187,8 +248,8 @@
         var timeExp = /\[(\d{2,})\:(\d{2})(?:\.(\d{2,3}))?\]/g;
 
         lrc = trim(lrc);
-        this.lrc = lrc;//lrc æ­Œè¯
-        this.lines = [];//è§£æç»“æœ
+        this.lrc = lrc;//lrc ¸è´Ê
+        this.lines = [];//½âÎö½á¹û
         var line, time, lines = lrc.split(/\n/)
                 , _last;
 
@@ -227,6 +288,16 @@
             $('.cbutton').css('border-color', '#fff').css('color', '#fff').removeClass('cbutton--click');
         }, 1100)
     });
+    var panel_active = 0;
+    $('.panel-btn').on('click', function () {
+        if (panel_active == 0) {
+            $('#panel').velocity("stop").velocity({left: '0'}, 500);
+            panel_active = 1;
+        } else {
+            $('#panel').velocity("stop").velocity({left: '-100%'}, 500);
+            panel_active = 0;
+        }
+    })
 </script>
 <script src="public/javascript/ctrl-btn.js"></script>
 </body>

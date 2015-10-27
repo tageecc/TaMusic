@@ -55,7 +55,7 @@
 .btn {
     float: left;
     margin-right: 20px;
-    top: 31px;
+    top: 40px;
     position: relative;
 }
 .cbutton,.btn:not(.btn--volume){
@@ -63,19 +63,19 @@
 }
 
 .btn .btn__icon {
-    height: 40px;
+    height: 53px;
 }
 
 .btn .btn__shadow {
     background-color: #ffffff;
     border-radius: 50%;
-    left: -15px;
-    height: 70px;
+    left: -12px;
+    height: 77px;
     opacity: 0;
     pointer-events: none;
     position: absolute;
-    top: -15px;
-    width: 70px;
+    top: -11px;
+    width: 77px;
 }
 
 .btn .btn__icon .icon__shape {
@@ -93,7 +93,9 @@
 .btn .btn__icon .icon__shape--orange {
     stroke: #ffa700;
 }
-
+.btn--play-pause{
+    top: 20px;
+}
 .btn--play-pause .btn__icon .icon__shape--circle {
     height: 40px;
     stroke-dasharray: 119.38052 119.38052;
@@ -109,7 +111,10 @@
 }
 
 .btn--volume .btn__shadow {
-    left: -12px;
+    left: -13px;
+    top: -15px;
+    width: 63px;
+    height: 63px;
 }
 
 .btn--volume .btn__icon .icon__shape--line-mute {
@@ -155,12 +160,12 @@
     padding: 0;
     background: none;
     color: rgba(255, 255, 255, 0.81);
-    font-size: 1.4em;
+    font-size: 1em;
     border-radius: 50%;
     border: 2px solid white;
     transition: all 0.7s;
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
 }
 
 .cbutton.cbutton--click,

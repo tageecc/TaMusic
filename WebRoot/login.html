@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>ç™»å…¥</title>
+    <meta charset="GBK">
+    <title>µÇÈë</title>
     <link rel="stylesheet" href="public/stylesheet/login.css"/>
 </head>
 <body>
@@ -50,14 +50,14 @@
 <section id="content">
     <div id="logo">TaMusic</div>
     <div class="form-group">
-        <label id="lab-name" for="name">ç”¨æˆ·å</label><input id="name" name="str" type="text" autocomplete="off"
+        <label id="lab-name" for="name">ÓÃ»§Ãû</label><input id="name" name="str" type="text" autocomplete="off"
                                                           required/>
     </div>
     <div class="form-group">
-        <label id="lab-pwd" for="pwd">å¯†&nbsp;ç </label><input id="pwd" name="pwd" type="password" required/>
+        <label id="lab-pwd" for="pwd">ÃÜ&nbsp;Âë</label><input id="pwd" name="pwd" type="password" required/>
     </div>
-    <button id="submit">ç™»å…¥</button>
-    <span id="span"><a href="#">å¿«é€Ÿæ³¨å†Œ</a> | <a href="#">å¿˜è®°å¯†ç </a></span>
+    <button id="submit">µÇÈë</button>
+    <span id="span"><a href="#">¿ìËÙ×¢²á</a> | <a href="#">Íü¼ÇÃÜÂë</a></span>
 </section>
 <script src="public/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="public/bower_components/velocity/velocity.min.js"></script>
@@ -97,13 +97,13 @@
         var data = {};
         var str = $('#name').val();
         if (str == null || str.length == 0) {
-            msgBar(false, 'è¯·å¡«å†™è´¦å·å!');
+            msgBar(false, 'ÇëÌîĞ´ÕËºÅÃû!');
             return false;
         }
         data.str = str;
         var pwd = $('#pwd').val();
         if (pwd == null || pwd.length == 0) {
-            msgBar(false, 'è¯·å¡«å†™å¯†ç !');
+            msgBar(false, 'ÇëÌîĞ´ÃÜÂë!');
             return false;
         }
         data.pwd = $.md5(pwd);
@@ -111,7 +111,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "user/login",
+            url: "login",
             data: data,
             success: function (data) {
                 if (data.status) {
@@ -125,7 +125,7 @@
 
             },
             error: function (err) {
-                msgBar(false, 'ç½‘ç»œé”™è¯¯ï¼Œè¯·ç¨åå†è¯•!');
+                msgBar(false, 'ÍøÂç´íÎó£¬ÇëÉÔºóÔÙÊÔ!');
                 $('#submit').attr("disabled", false);
             }
         });

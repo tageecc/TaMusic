@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>上传文件</title>
+    <link rel="stylesheet" href="public/stylesheet/upload.css"/>
+</head>
+
+<body>
+
+<header>
+    <h1>TaMusic 文件上传</h1>
+</header>
+
+<div id="dropbox">
+    <div class="wellcome">
+        <span class="message">拖拽文件到此处</span>
+        or <br/>
+        <button class="upload" onclick="alert('先拖着吧，这个不会写')">点击上传</button>
+    </div>
+</div>
+
+<script src="public/javascript/jquery.min.js"></script>
+<script src="public/javascript/velocity.min.js"></script>
+<script src="public/javascript/jquery.filedrop.js"></script>
+<script>
+    //        var template = '<div class="preview">' +
+    //                '<i>' + (j + 1) + '.</i>' +
+    //                '<div class="progressHolder">' +
+    //                '<div class="progress"></div>' +
+    //                '<span>' + fileList[j].name + '</span>' +
+    //                '</div>' +
+    //                '</div>';
+    //        $('#dropbox').append(template);
+    var $type = ['mp3', 'lrc'];
+
+    $('#dropbox').on({
+        drop: function (e) {  //拖后放
+            e.preventDefault();
+            var fileList = e.dataTransfer.files;//获取上传文件对象
+            var fileNum = fileList.length;
+            if (fileNum == 0) {//如果没有上传文件
+                return false;
+            }
+            if (fileNum > 50 || $('.preview').length > 50 || $('.preview').length + fileNum > 50) {//同时上传文件数量
+                alert("最多同时上传50个文件");
+                return false;
+            }
+            for (var i = 0; i < fileNum; i++) {
+                //判断文件格式
+                console.log(fileList[i].name);
+                if ($.inArray(fileList[i].name.substring(fileList[i].name.lastIndexOf('.') + 1).toLowerCase(), $type)) {
+                    alert("请添加MP3或Lrc格式的文件");
+                    return false;
+                }
+                //判断单个文件大小
+                if (Math.floor((fileList[i].size) / 1024 / 1024) > 10) {
+                    alert("单个文件大小不能超过10M.");
+                    return false;
+                }
+            }
+            //获得当前页面的progress
+            var progressNum = document.getElementsByClassName("progress").length;
+            //开始上传
+            for (var j = 0; j < fileNum; j++) {
+                upload(j, fileList[j], progressNum);
+            }
+
+        },
+        dragover: function (e) {    //拖来拖去
+            e.preventDefault();
+        }
+    });
+
+    function upload(i, file, progressNum) {
+
+        var fd = new FormData(); // html5新增的对象,可以包装字符,二进制信息
+        fd.append('file', file);
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 1) {
+                var template = '<div class="preview">' +
+                        '<i>' + (i + progressNum + 1) + '.</i>' +
+                        '<div class="progressHolder">' +
+                        '<div class="progress"></div>' +
+                        '<span>' + file.name + '</span>' +
+                        '</div>' +
+                        '<div class="status">' +
+                        '<img /><span></span>' +
+                        '</div>' +
+                        '</div>';
+                $('#dropbox').append(template);
+            }
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                console.log(xhr.responseText);
+                var json = JSON.parse(xhr.responseText);
+                var $statusBox = $(".status:eq(" + (progressNum + i) + ")");
+                if (json.status) {
+                    $statusBox.find('img').attr('src', 'public/image/done.png');
+                    if (json.jsmc) {
+                        $statusBox.find('span').text(json.jsmc);
+                    } else {
+                        $statusBox.find('span').text(json.msg);
+                    }
+                } else {
+                    $statusBox.find('span').text(json.msg).css('color', 'red');
+                }
+            }
+        };
+        xhr.upload.onprogress = function (e) {
+            var percent = 0;
+            if (e.lengthComputable) {
+                percent = 100 * e.loaded / e.total;
+                console.log("percent:" + percent);
+                $(".progress:eq(" + (progressNum + i) + ")").css("width", percent + "%");
+            }
+        };
+
+        xhr.open('POST', 'file/upload', true);
+        xhr.send(fd);
+    }
+</script>
+</body>
+</html>
+
