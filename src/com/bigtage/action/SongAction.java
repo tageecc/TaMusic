@@ -1,6 +1,7 @@
 package com.bigtage.action;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -10,8 +11,11 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.bigtage.bean.HistorySong;
+import com.bigtage.bean.Like;
 import com.bigtage.bean.Song;
 import com.bigtage.bean.User;
 import com.bigtage.service.SongService;
@@ -31,18 +35,38 @@ public class SongAction {
 	 * @param session
 	 * @return
 	 */
-	@RequestMapping("/play")
+	@RequestMapping("/play/{panel}")
 	@ResponseBody
-	public Map<String, Object> randomPlay(HttpServletRequest request,
-			HttpSession session) {
+	public Map<String, Object> randomPlay(@PathVariable String panel,
+			HttpServletRequest request, HttpSession session) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		Song song = songService.randomPlay((User) session.getAttribute("user"));
-		map.put("status", true);
-		map.put("song", song);
+		if (session.getAttribute("user") == null) {
+			map.put("status", false);
+			map.put("msg", "暂时不开放游客，请先登录");
+			return map;
+		}
+		Song song = songService.playSong((User) session.getAttribute("user"),
+				panel);
+		if (song != null) {
+			map.put("status", true);
+			map.put("song", song);
+		} else {
+			map.put("status", false);
+			map.put("msg", "出错了");
+		}
+
 		return map;
 
 	}
 
+	/**
+	 * 根据id获取歌曲
+	 * 
+	 * @param id
+	 * @param request
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping("/{id}")
 	@ResponseBody
 	public Map<String, Object> getSongById(@PathVariable int id,
@@ -59,6 +83,13 @@ public class SongAction {
 
 	}
 
+	/**
+	 * 获取上一曲
+	 * 
+	 * @param request
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping("/previous")
 	@ResponseBody
 	public Map<String, Object> getPrevious(HttpServletRequest request,
@@ -69,7 +100,7 @@ public class SongAction {
 		// 判断用户是否登陆，若没登陆则直接返回随机
 		User user = (User) session.getAttribute("user");
 		if (user == null) {
-			Song song = songService.randomPlay(null);
+			Song song = songService.playSong(null, "");
 			map.put("status", true);
 			map.put("song", song);
 			return map;
@@ -85,5 +116,88 @@ public class SongAction {
 			return map;
 		}
 
+	}
+
+	/**
+	 * 根据用户id 获取上传过的所有歌曲
+	 * 
+	 * @param request
+	 * @param session
+	 * @return
+	 */
+	@RequestMapping("/myfile")
+	@ResponseBody
+	public Map<String, Object> getMyfile(HttpServletRequest request,
+			HttpSession session) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 判断用户是否登陆，若没登陆则直接返回随机
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			map.put("status", false);
+			map.put("msg", "请登录");
+			return map;
+		}
+		System.out.println(user.getUid());
+		List<Song> songs = songService.getMyfile(user.getUid());
+		if (songs != null && songs.size() > 0) {
+			map.put("status", true);
+			map.put("songs", songs);
+		} else {
+			map.put("status", false);
+			map.put("msg", "你还没传过歌！");
+		}
+		return map;
+	}
+
+	@RequestMapping("/like/{songid}")
+	@ResponseBody
+	public Map<String, Object> likeSong(@PathVariable int songid,
+			HttpServletRequest request, HttpSession session) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			map.put("status", false);
+			map.put("msg", "暂时不开放游客，请先登录");
+			return map;
+		}
+
+		if (songService.addLike(new Like(user.getUid(), songid))) {
+			map.put("status", true);
+		} else {
+			map.put("status", false);
+			map.put("msg", "网络繁忙请稍后再试");
+		}
+		return map;
+	}
+
+	/**
+	 * 保存播放记录
+	 * 
+	 * @param songid
+	 * @param request
+	 * @param session
+	 * @return
+	 */
+	@RequestMapping("/history/{songid}")
+	@ResponseBody
+	public Map<String, Object> SongHistory(@PathVariable int songid,
+			HttpServletRequest request, HttpSession session) {
+		System.out.println(songid);
+		Map<String, Object> map = new HashMap<String, Object>();
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			map.put("status", false);
+			map.put("msg", "请登录");
+			return map;
+		}
+		if (songService.saveHistory(new HistorySong(user.getUid(), songid,
+				System.currentTimeMillis()))) {
+			map.put("status", true);
+		} else {
+			map.put("status", false);
+			map.put("msg", "网络繁忙请稍后再试");
+		}
+		return map;
 	}
 }

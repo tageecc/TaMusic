@@ -32,7 +32,9 @@
     //                '</div>' +
     //                '</div>';
     //        $('#dropbox').append(template);
-    var $type = ['mp3', 'lrc'];
+
+    //暂时只支持mp3
+    var $type = ['mp3'];
 
     $('#dropbox').on({
         drop: function (e) {  //拖后放
@@ -54,7 +56,7 @@
                     return false;
                 }
                 //判断单个文件大小
-                if (Math.floor((fileList[i].size) / 1024 / 1024) > 10) {
+                if (Math.floor((fileList[i].size) / 1024 / 1024) > 30) {
                     alert("单个文件大小不能超过10M.");
                     return false;
                 }

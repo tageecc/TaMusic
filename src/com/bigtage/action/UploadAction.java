@@ -10,10 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.bigtage.bean.Song;
 import com.bigtage.bean.User;
@@ -36,7 +39,7 @@ public class UploadAction {
 	 */
 	@RequestMapping(value = "/upload")
 	@ResponseBody
-	public Map<String, Object> upload(HttpServletRequest request,
+	public Map<String, Object> uploadFile(HttpServletRequest request,
 			HttpSession session) throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 		// 判断用户是否登陆
@@ -72,23 +75,68 @@ public class UploadAction {
 						multipartFile.getBytes());
 			}
 			if (file != null) {
-				// 如果文件类型为mp3，则分析其属性
-				if (".mp3".equals(suffix)) {
-					MP3Info info = new MP3Info(file);
-					Song song = new Song(info.getName(), info.getSinger(),
-							"upload/" + md5 + suffix,
-							info.getImg(realPath, md5), user.getUid(),
-							System.currentTimeMillis(), 0);
-					if (songService.save(song)) {
-						map.put("status", true);
-						map.put("msg", "上传成功！");
-					}
-
+				MP3Info info = new MP3Info(file);
+				Song song = new Song(info.getName(), info.getSinger(),
+						"upload/" + md5 + suffix, "",
+						info.getImg(realPath, md5), user.getUid(),
+						System.currentTimeMillis(), 0);
+				if (songService.save(song)) {
+					map.put("status", true);
+					map.put("msg", "上传成功！");
 				}
+
 			} else {
 				map.put("status", false);
 				map.put("msg", "文件保存失败");
 			}
+		}
+		return map;
+	}
+
+	/**
+	 * 上传歌词
+	 * 
+	 * @param request
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/upload/{songid}/lrc")
+	@ResponseBody
+	public Map<String, Object> uploadLrc(@PathVariable int songid,
+			HttpServletRequest request, HttpSession session) throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 判断用户是否登陆
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			map.put("status", false);
+			map.put("msg", "请先登录！");
+			return map;
+		}
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		Iterator<String> fileNames = multipartRequest.getFileNames();
+		while (fileNames.hasNext()) {
+			MultipartFile multipartFile = multipartRequest.getFile(fileNames
+					.next());
+			// 文件名
+			String filename = multipartFile.getOriginalFilename();
+			// 获取文件的后缀
+			String suffix = filename.substring(filename.lastIndexOf("."));
+			if (".lrc".equals(suffix.toLowerCase())) {
+				String lrc = new String(multipartFile.getBytes(), "GBK");
+				System.out.println(lrc);
+				if (lrc != null && lrc.length() > 0) {
+					if (songService.updateLrc(songid, lrc)) {
+						map.put("status", true);
+						map.put("lrc", lrc);
+					}
+
+				} else {
+					map.put("status", false);
+					map.put("msg", "文件保存失败");
+				}
+			}
+
 		}
 		return map;
 	}

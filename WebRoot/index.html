@@ -41,6 +41,7 @@
         </ul>
     </section>
 </header>
+<!--主页、显示歌词和歌曲信息-->
 <section id="main">
     <article>
         <div class="lrc">
@@ -51,29 +52,29 @@
         </div>
     </article>
 </section>
-
+<!--频道列表-->
 <section id="panel">
     <article>
         <ul>
-            <li><span class="gif"></span>
+            <li id="srpd"><span class="gif"></span>
                 <i class="fa fa-user"></i>
 
                 <p>私人频道</p>
             </li>
-            <li><span class="gif"></span>
+            <li id="hxpd"><span class="gif"></span>
                 <i class="fa fa-heart"></i>
 
                 <p>红心频道</p>
             </li>
-            <li><span class="gif" style="display: inline-block"></span>
-                <i class="fa fa-coffee"></i>
-
-                <p>随便听听</p>
-            </li>
-            <li><span class="gif"></span>
+            <li id="rmpd"><span class="gif"></span>
                 <i class="fa fa-area-chart"></i>
 
                 <p>热门频道</p>
+            </li>
+            <li id="sbtt" class="panel-active"><span class="gif" style="display: inline-block"></span>
+                <i class="fa fa-coffee"></i>
+
+                <p>随便听听</p>
             </li>
             <a href="upload.html" target="_blank">
                 <li>
@@ -86,12 +87,19 @@
         <div style="clear: both;"></div>
     </article>
 </section>
-
+<!--我上传的文件-->
+<section id="myfile">
+    <ul></ul>
+</section>
 <footer>
-    <section>
-        <img src="" alt=""/>
-    </section>
+    <!--控制器-->
     <section id="ctrl">
+        <div class="btn" style="width: 35px;top: 44px;">
+            <input type="checkbox" id="toggle-menu"/>
+            <label for="toggle-menu">
+                <span class="menu-icon"></span>
+            </label>
+        </div>
         <div class="btn">
             <button onclick="play('song/previous')" class="cbutton cbutton--effect-ivana">
                 <i class="cbutton__icon fa fa-fw fa-step-backward"></i>
@@ -142,70 +150,90 @@
     </section>
     <section id="setting"></section>
 </footer>
+<input type="file" id="lrcfile" accept=".lrc,.LRC" style="display: none;"/>
 <script src="public/javascript/jquery.min.js"></script>
 <script src="public/javascript/velocity.min.js"></script>
 <script src='public/javascript/hammer.js'></script>
 <script src='public/javascript/TweenMax.min.js'></script>
 
 <script>
-    var playlist = [];
     var audio = document.createElement('audio');//设置全局audio
-    $(document).ready(play('song/play'));
-
-    function play(url) {
+    var islrc = false;//判断lrc文件是否存在
+    var lrcdata = [];//歌词文件内容
+    var panel = 'sbtt';//频道类型
+    $(document).ready(play());
+    //刷新页面后、点击下一曲 直接获取歌曲
+    function play(str) {
+        var url = arguments[0] ? arguments[0] : 'song/play/' + panel;
+        console.log(url);
         $.ajax({
             type: 'get',
             url: url,
             dataType: 'json',
             success: function (data) {
-                console.log(data);
-                playlist.push(data.song.songid);//保存歌曲列表
-                if (data.status) {
-                    if (data.lrc) {//判断src是否存在
-                        var lrc = Parser(data);//解析lrc
-                        initLrc(lrc);//将lrc填充到网页
-                    } else {
-                        $('.lrc ul').html('<li>暂无歌词</li>')
-                    }
-                    loadAudio(data.song);//创建音频文件，填充到页面
-                    var lastI = -1, lastTime = 0;
-                    audio.ontimeupdate = function () {
-                        //设置进度条
-                        $('.progress').css('width', (this.currentTime / this.duration) * 100 + '%');
-                        //设置结束时间
-                        $('.progress-text').text('-' + parseInt((this.duration - this.currentTime) / 60) + ':' + parseInt((this.duration - this.currentTime) % 60));
-                        //若歌词存在
-                        if (data.lrc) {
-                            for (var i = 0; i < lrc.length; i++) {
-                                if (this.currentTime * 1000 < lrc[i].time + 1300) {
-                                    break;
-                                }
-                                if (lastI < i) {
-                                    //歌词变色
-                                    $('.lrc ul li').removeClass('current');
-                                    $('#li_' + i).addClass('current');
-                                    //滚
-                                    $('.lrc ul').animate({top: 350 - 35 * i + 'px'}, 0);
-                                    lastI = i;
-                                }
-                            }
-                            if (lastTime > this.currentTime) {
-                                lastI = 0;
-                            }
-                            lastTime = this.currentTime;
-                        }
-                    };
-                    //歌曲播放完毕
-                    audio.addEventListener('ended', function () {
-                        play('song/play');
-                    }, false);
-
-                }
-
+                palysong(data)
             }
         });
     }
+    //播放歌曲
+    function palysong(data) {
 
+        if (data.status) {
+            if (data.song.lrc.length > 10) {//判断src是否存在
+                var lrc = Parser(data.song.lrc);//解析lrc
+                initLrc(lrc);//将lrc填充到网页
+                islrc = true;//设置全局变量
+                lrcdata = lrc;
+            } else {
+                $('.lrc ul').html('<li>暂无歌词,或者你可以<a href="javascript:lrcupload()">点击上传</a></li>');
+                islrc = false;
+                lrcdata = [];
+            }
+            loadAudio(data.song);//创建音频文件，填充到页面
+            var lastI = -1, lastTime = 0;
+            audio.ontimeupdate = function () {
+                //设置进度条
+                $('.progress').css('width', (this.currentTime / this.duration) * 100 + '%');
+                //设置结束时间
+                $('.progress-text').text('-' + parseInt((this.duration - this.currentTime) / 60) + ':' + parseInt((this.duration - this.currentTime) % 60));
+                //若歌词存在
+                if (islrc) {
+                    for (var i = 0; i < lrcdata.length; i++) {
+//                        if (this.currentTime * 1000 < lrc[i].time + 1000) {
+                        if (this.currentTime * 1000 < lrcdata[i].time) {
+                            break;
+                        }
+                        if (lastI < i) {
+                            //歌词变色
+                            $('.lrc ul li').removeClass('current');
+                            $('#li_' + i).addClass('current');
+                            //滚
+                            $('.lrc ul').animate({top: 350 - 35 * i + 'px'}, 0);
+                            lastI = i;
+                        }
+                    }
+                    if (lastTime > this.currentTime) {
+                        lastI = 0;
+                    }
+                    lastTime = this.currentTime;
+                }
+            };
+            //歌曲播放完毕
+            audio.addEventListener('ended', function () {
+                //保存播放记录
+                $.ajax({
+                    type: 'get',
+                    url: 'song/history/' + $(audio).data('songid'),
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(data);
+                    }
+                });
+                play();
+            }, false);
+
+        }
+    }
     //设置暂停播放按钮
     $('#play').on('click', function () {
         if ($(this).hasClass("playing")) {
@@ -219,6 +247,9 @@
 
     //设置播放位置
     $('#bar').on('mousedown', function (e) {
+        if (3 == e.which) {
+            return false;
+        }
         $(this).on('mousemove', function (e2) {
             $('.progress').css('width', e2.offsetX + 'px');
             audio.currentTime = (e2.offsetX / $(this).width()) * audio.duration;
@@ -234,11 +265,13 @@
     function loadAudio(song) {
 
         audio.setAttribute('src', song.src);
+        $(audio).data('songid', song.songid);
         audio.play();
         $('#process').append(audio);
 
     }
     function initLrc(lrc) {
+        $('.lrc ul').empty();
         for (var i = 0; i < lrc.length; i++) {
             $('.lrc ul').append('<li id="li_' + i + '">' + lrc[i].txt + '</li>');
         }
@@ -294,10 +327,99 @@
             $('#panel').velocity("stop").velocity({left: '0'}, 500);
             panel_active = 1;
         } else {
-            $('#panel').velocity("stop").velocity({left: '-100%'}, 500);
+            $('#panel').velocity("stop").velocity({left: '100%', 'diaplay': 'none'}, 500);
             panel_active = 0;
         }
-    })
+    });
+
+    $('#toggle-menu').on('click', function () {
+        if (this.checked) {
+            $('#myfile').velocity({left: '0'}, "easeOutQuad");
+            getMyfile();
+        } else {
+            $('#myfile').velocity({left: '-350px'}, "easeInSine");
+        }
+    });
+    //获取我上传的文件
+    function getMyfile() {
+        $.ajax({
+            type: 'get',
+            url: 'song/myfile',
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    var html = '';
+                    for (var i = 0; i < data.songs.length; i++) {
+                        html += '<li class="song" title="' + data.songs[i].name + '" data-id="' + data.songs[i].songid + '">' + data.songs[i].name + '</li>';
+                    }
+                    $('#myfile ul').html(html);
+                } else {
+                    $('#myfile ul').html('<li>' + data.msg + '</li>');
+                }
+
+            }
+        })
+    }
+    //根据id播放歌曲
+    $(document).on('click', '.song', function () {
+        play('song/' + $(this).data('id'));
+    });
+
+    //上传歌词文件
+    function lrcupload() {
+        $lrc = $('#lrcfile');
+        $lrc.click();
+        $lrc.change(function () {
+            // FormData 对象
+            var form = new FormData();
+            form.append("file", $lrc[0].files[0]);// 文件对象  卧槽这
+            // XMLHttpRequest对象
+            var xhr = new XMLHttpRequest();
+            xhr.enctype = "multipart/form-data";
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var data = eval('(' + xhr.responseText + ')');
+                    if (data.status) {
+                        var lrc = Parser(data.lrc);
+                        initLrc(lrc);//将lrc填充到网页
+                        islrc = true;
+                        lrcdata = lrc;
+                    } else {
+                        islrc = false;
+                        lrcdata = [];
+                    }
+
+                }
+            };
+            xhr.open("post", 'file/upload/' + $(audio).data('songid') + '/lrc', true);
+            xhr.send(form);
+        });
+
+    }
+
+    //频道点击
+    $('#panel').find('li').on('click', function () {
+        $(this).parent().find('span').css('display', 'none');
+        $(this).siblings().removeClass('panel-active');
+        $(this).addClass('panel-active');
+        $(this).find('span').css('display', 'inline-block');
+    });
+    $('#srpd').on('click', function () {
+        panel = 'srpd';
+        play();
+    });
+    $('#hxpd').on('click', function () {
+        panel = 'hxpd';
+        play();
+    });
+    $('#sbtt').on('click', function () {
+        panel = 'hxpd';
+        play();
+    });
+    $('#rmpd').on('click', function () {
+        panel = 'rmpd';
+        play();
+    });
 </script>
 <script src="public/javascript/ctrl-btn.js"></script>
 </body>

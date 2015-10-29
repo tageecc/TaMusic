@@ -1,3 +1,4 @@
+@charset "UTF-8";
 * {
     box-sizing: border-box;
 }
@@ -94,7 +95,7 @@
     stroke: #ffa700;
 }
 .btn--play-pause{
-    top: 20px;
+    top: 30px;
 }
 .btn--play-pause .btn__icon .icon__shape--circle {
     height: 40px;
@@ -162,7 +163,7 @@
     color: rgba(255, 255, 255, 0.81);
     font-size: 1em;
     border-radius: 50%;
-    border: 2px solid white;
+    border: 3px solid white;
     transition: all 0.7s;
     width: 35px;
     height: 35px;
@@ -264,4 +265,45 @@
         -webkit-transform: scale3d(1.2, 1.2, 1);
         transform: scale3d(1.2, 1.2, 1);
     }
+}
+
+
+#toggle-menu{
+    display: none;
+}
+
+.menu-icon {
+    font-size: 1.8em;
+    color: #FFFFFF;
+    text-align: center;
+    display: block;
+    margin: 15% auto;
+    cursor: pointer;
+    transition: transform .2s ease;
+}
+.menu-icon:hover {
+    transform: scale(0.9);
+}
+.menu-icon:before, .menu-icon:after {
+    line-height: .5;
+}
+.menu-icon:before {
+    content: '☰';
+    display: block;
+}
+.menu-icon:after {
+    content: '╳';
+    font-size: .75em;
+    font-weight: 800;
+    display: none;
+}
+
+#toggle-menu:checked ~ label[for="toggle-menu"] .menu-icon {
+    transform: rotate(-180deg);
+}
+#toggle-menu:checked ~ label[for="toggle-menu"] .menu-icon:before {
+    display: none;
+}
+#toggle-menu:checked ~ label[for="toggle-menu"] .menu-icon:after {
+    display: block;
 }
