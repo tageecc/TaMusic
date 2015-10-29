@@ -218,22 +218,23 @@
                     lastTime = this.currentTime;
                 }
             };
-            //歌曲播放完毕
-            audio.addEventListener('ended', function () {
-                //保存播放记录
-                $.ajax({
-                    type: 'get',
-                    url: 'song/history/' + $(audio).data('songid'),
-                    dataType: 'json',
-                    success: function (data) {
-                        console.log(data);
-                    }
-                });
-                play();
-            }, false);
+
 
         }
     }
+    //歌曲播放完毕
+    audio.addEventListener('ended', function () {
+        //保存播放记录
+        $.ajax({
+            type: 'get',
+            url: 'song/history/' + $(audio).data('songid'),
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+            }
+        });
+        play();
+    }, false);
     //设置暂停播放按钮
     $('#play').on('click', function () {
         if ($(this).hasClass("playing")) {
