@@ -9,9 +9,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
+import com.bigtage.bean.DisLike;
 import com.bigtage.bean.HistorySong;
 import com.bigtage.bean.Like;
 import com.bigtage.bean.Song;
+import com.bigtage.bean.User;
 import com.bigtage.dao.SongDAO;
 
 @Repository
@@ -65,13 +67,15 @@ public class SongDAOImpl implements SongDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Song> getSongs() {
+	public List<Song> getSongs(User user) {
 		Session session = sessionFactory.getCurrentSession();
 		Transaction tx = null;
 		List<Song> songs = null;
 		try {
 			tx = session.beginTransaction();
-			songs = session.createQuery("from Song").list();
+			songs = session.createSQLQuery(
+					"select s.* from song as s where s.songid not in(select d.songid from dislike_info as d where d.uid='"
+							+ user.getUid() + "')").addEntity("s", Song.class).list();
 			tx.commit();
 		} catch (Exception e) {
 			if (tx != null) {
@@ -241,7 +245,7 @@ public class SongDAOImpl implements SongDAO {
 		try {
 			tx = session.beginTransaction();
 			songs = session.createQuery(
-					"from Song s,Like l where s.songid=l.songid and l.uid='"
+					"select s from Song s,Like l where s.songid=l.songid and l.uid='"
 							+ uid + "'").list();
 			tx.commit();
 		} catch (Exception e) {
@@ -252,6 +256,7 @@ public class SongDAOImpl implements SongDAO {
 		}
 		return songs;
 	}
+
 	/**
 	 * 热门推荐
 	 */
@@ -282,6 +287,119 @@ public class SongDAOImpl implements SongDAO {
 		try {
 			tx = session.beginTransaction();
 			session.save(like);
+			tx.commit();
+		} catch (Exception e) {
+			flag = false;
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+		}
+		return flag;
+	}
+
+	@Override
+	public boolean isLike(Like like) {
+		Session session = sessionFactory.getCurrentSession();
+		Transaction tx = null;
+		boolean flag = false;
+		try {
+			tx = session.beginTransaction();
+			if (session
+					.createQuery(
+							"from Like where songid='" + like.getSongid()
+									+ "' and uid='" + like.getUid() + "'")
+					.list().size() > 0) {
+				flag = true;
+			}
+			tx.commit();
+		} catch (Exception e) {
+			flag = false;
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+		}
+		return flag;
+	}
+
+	@Override
+	public boolean cancleLike(Like like) {
+		Session session = sessionFactory.getCurrentSession();
+		Transaction tx = null;
+		boolean flag = true;
+		try {
+			tx = session.beginTransaction();
+			session.createQuery(
+					"delete Like where songid='" + like.getSongid()
+							+ "' and uid='" + like.getUid() + "'")
+					.executeUpdate();
+			tx.commit();
+		} catch (Exception e) {
+			flag = false;
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+		}
+		return flag;
+	}
+
+	@Override
+	public boolean isDisLike(DisLike dislike) {
+		Session session = sessionFactory.getCurrentSession();
+		Transaction tx = null;
+		boolean flag = false;
+		try {
+			tx = session.beginTransaction();
+			if (session
+					.createQuery(
+							"from DisLike where songid='" + dislike.getSongid()
+									+ "' and uid='" + dislike.getUid() + "'")
+					.list().size() > 0) {
+				flag = true;
+			}
+			tx.commit();
+		} catch (Exception e) {
+			flag = false;
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+		}
+		return flag;
+	}
+
+	@Override
+	public boolean addDisLike(DisLike dislike) {
+		Session session = sessionFactory.getCurrentSession();
+		Transaction tx = null;
+		boolean flag = true;
+		try {
+			tx = session.beginTransaction();
+			session.save(dislike);
+			tx.commit();
+		} catch (Exception e) {
+			flag = false;
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+		}
+		return flag;
+	}
+
+	@Override
+	public boolean cancleDisLike(DisLike dislike) {
+		Session session = sessionFactory.getCurrentSession();
+		Transaction tx = null;
+		boolean flag = true;
+		try {
+			tx = session.beginTransaction();
+			session.createQuery(
+					"delete DisLike where songid='" + dislike.getSongid()
+							+ "' and uid='" + dislike.getUid() + "'")
+					.executeUpdate();
 			tx.commit();
 		} catch (Exception e) {
 			flag = false;

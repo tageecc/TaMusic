@@ -11,9 +11,9 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.bigtage.bean.DisLike;
 import com.bigtage.bean.HistorySong;
 import com.bigtage.bean.Like;
 import com.bigtage.bean.Song;
@@ -40,16 +40,23 @@ public class SongAction {
 	public Map<String, Object> randomPlay(@PathVariable String panel,
 			HttpServletRequest request, HttpSession session) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		if (session.getAttribute("user") == null) {
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
 			map.put("status", false);
 			map.put("msg", "暂时不开放游客，请先登录");
 			return map;
 		}
 		Song song = songService.playSong((User) session.getAttribute("user"),
 				panel);
+
 		if (song != null) {
 			map.put("status", true);
 			map.put("song", song);
+			// 获得是否喜欢此歌曲
+			if (songService.isLike(new Like(user.getUid(), song.getSongid()))) {
+				map.put("islike", true);
+			}
+
 		} else {
 			map.put("status", false);
 			map.put("msg", "出错了");
@@ -72,10 +79,20 @@ public class SongAction {
 	public Map<String, Object> getSongById(@PathVariable int id,
 			HttpServletRequest request, HttpSession session) {
 		Map<String, Object> map = new HashMap<String, Object>();
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			map.put("status", false);
+			map.put("msg", "暂时不开放游客，请先登录");
+			return map;
+		}
 		Song song = songService.getSongById(id);
 		if (song != null) {
 			map.put("status", true);
 			map.put("song", song);
+			// 获得是否喜欢此歌曲
+			if (songService.isLike(new Like(user.getUid(), song.getSongid()))) {
+				map.put("islike", true);
+			}
 		} else {
 			map.put("status", false);
 		}
@@ -109,13 +126,15 @@ public class SongAction {
 		if (song != null) {
 			map.put("status", true);
 			map.put("song", song);
-			return map;
+			// 获得是否喜欢此歌曲
+			if (songService.isLike(new Like(user.getUid(), song.getSongid()))) {
+				map.put("islike", true);
+			}
 		} else {
 			map.put("status", false);
 			map.put("msg", "第一次来听歌就点上一曲的你真是够了!");
-			return map;
 		}
-
+		return map;
 	}
 
 	/**
@@ -150,6 +169,14 @@ public class SongAction {
 		return map;
 	}
 
+	/**
+	 * 添加喜欢
+	 * 
+	 * @param songid
+	 * @param request
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping("/like/{songid}")
 	@ResponseBody
 	public Map<String, Object> likeSong(@PathVariable int songid,
@@ -161,9 +188,32 @@ public class SongAction {
 			map.put("msg", "暂时不开放游客，请先登录");
 			return map;
 		}
-
-		if (songService.addLike(new Like(user.getUid(), songid))) {
+		int i = songService.addLike(new Like(user.getUid(), songid));
+		if (i != 0) {
 			map.put("status", true);
+			map.put("count", i);
+		} else {
+			map.put("status", false);
+			map.put("msg", "网络繁忙请稍后再试");
+		}
+		return map;
+	}
+
+	@RequestMapping("/dislike/{songid}")
+	@ResponseBody
+	public Map<String, Object> dislikeSong(@PathVariable int songid,
+			HttpServletRequest request, HttpSession session) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			map.put("status", false);
+			map.put("msg", "请先登录");
+			return map;
+		}
+		int i = songService.addDisLike(new DisLike(user.getUid(), songid));
+		if (i != 0) {
+			map.put("status", true);
+			map.put("count", i);
 		} else {
 			map.put("status", false);
 			map.put("msg", "网络繁忙请稍后再试");

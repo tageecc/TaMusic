@@ -63,8 +63,11 @@ var PlayPauseUIButton = function () {
     PlayPauseUIButton.prototype = Object.create(UIButton.prototype);
     PlayPauseUIButton.prototype.toggle = function () {
         if (this.timeline.yoyo()) {
+            $('#info-img').css('opacity','0');
             this.pause();
+
         } else {
+            $('#info-img').css('opacity','1');
             this.play();
         }
     };
@@ -221,12 +224,8 @@ var VolumeUIButton = function () {
     };
     return VolumeUIButton;
 }();
-$('.btn--play-pause').each(function () {
-    new PlayPauseUIButton($(this));
-});
-$('.btn--volume').each(function () {
-    var btn = new VolumeUIButton($(this));
-    btn.on('volumeChange', function (vol) {
-        audio.volume = vol / 100;
-    });
+var playPauseUIButton = new PlayPauseUIButton($('.btn--play-pause'));
+var volumeUIButton = new VolumeUIButton($('.btn--volume'));
+volumeUIButton.on('volumeChange', function (vol) {
+    audio.volume = vol / 100;
 });

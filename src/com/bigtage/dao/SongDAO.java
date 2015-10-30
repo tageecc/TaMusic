@@ -2,9 +2,11 @@ package com.bigtage.dao;
 
 import java.util.List;
 
+import com.bigtage.bean.DisLike;
 import com.bigtage.bean.HistorySong;
 import com.bigtage.bean.Like;
 import com.bigtage.bean.Song;
+import com.bigtage.bean.User;
 
 public interface SongDAO {
 
@@ -12,7 +14,7 @@ public interface SongDAO {
 
 	public boolean eixt(Song song);
 
-	public List<Song> getSongs();
+	public List<Song> getSongs(User user);
 
 	public List<Song> getSongById(int id);
 
@@ -32,6 +34,16 @@ public interface SongDAO {
 
 	public List<Song> getSongRmpd();
 
-	public boolean addLike(Like like);
+	public boolean addLike(Like like);// 添加过喜欢
+
+	public boolean isLike(Like like);// 是否添加过喜欢
+
+	public boolean cancleLike(Like like);// 取消喜欢
+
+	public boolean isDisLike(DisLike dislike);// 是否添加过不喜欢
+
+	public boolean addDisLike(DisLike dislike);// 添加不喜欢
+
+	public boolean cancleDisLike(DisLike dislike);// 取消不喜欢
 
 }

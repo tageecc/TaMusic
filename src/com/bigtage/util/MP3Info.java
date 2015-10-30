@@ -88,6 +88,6 @@ public class MP3Info {
 			logger.info("mp3文件图片解析失败!");
 		}
 
-		return flag ? "upload/" + md5 + ".jpg" : "";
+		return flag ? "upload/" + md5 + ".jpg" : "public/image/cover.jpg";
 	}
 }

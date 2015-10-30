@@ -10,6 +10,8 @@
 </head>
 <body>
 <section id="msgBar"></section>
+<!--遮罩层-->
+<section id="maskLayer"></section>
 <header>
     <section id="logo">TaMusic</section>
     <section id="user">
@@ -46,6 +48,22 @@
     <article>
         <div class="lrc">
             <ul></ul>
+        </div>
+        <div id="info" class="info-fix">
+            <img src="public/image/cover.jpg" alt=""/>
+
+            <div id="info-img">
+                <i class="fa fa-play"></i>
+
+                <p>点击继续播放</p>
+            </div>
+            <i id="fixed" class="fa fa-anchor"></i>
+
+            <p id="name">Wish I Stayed</p>
+
+            <p id="singer">Ellie Goulding</p>
+            <i id="like" class="fa fa-heart-o"></i>
+            <i id="dislike" class="fa fa-trash-o"></i>
         </div>
         <div class="panel-btn">
             <i class="fa fa-chevron-left"></i>
@@ -155,13 +173,15 @@
 <script src="public/javascript/velocity.min.js"></script>
 <script src='public/javascript/hammer.js'></script>
 <script src='public/javascript/TweenMax.min.js'></script>
-
+<script src="public/javascript/ctrl-btn.js"></script>
 <script>
     var audio = document.createElement('audio');//设置全局audio
     var islrc = false;//判断lrc文件是否存在
     var lrcdata = [];//歌词文件内容
     var panel = 'sbtt';//频道类型
-    $(document).ready(play());
+    $(document).ready(function () {
+        play();
+    });
     //刷新页面后、点击下一曲 直接获取歌曲
     function play(str) {
         var url = arguments[0] ? arguments[0] : 'song/play/' + panel;
@@ -190,6 +210,15 @@
                 lrcdata = [];
             }
             loadAudio(data.song);//创建音频文件，填充到页面
+            //填充歌曲名和歌手 封面、红心状态
+            $('#name').text(data.song.name);
+            $('#singer').text(data.song.singer);
+            $('#info').find('img').attr('src', data.song.img);
+            if (data.islike) {
+                $('#like').removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
+            } else {
+                $('#like').removeClass('fa-heart').addClass('fa-heart-o').css('color', 'black');
+            }
             var lastI = -1, lastTime = 0;
             audio.ontimeupdate = function () {
                 //设置进度条
@@ -322,12 +351,16 @@
             $('.cbutton').css('border-color', '#fff').css('color', '#fff').removeClass('cbutton--click');
         }, 1100)
     });
+
+    //打开频道页
     var panel_active = 0;
     $('.panel-btn').on('click', function () {
         if (panel_active == 0) {
             $('#panel').velocity("stop").velocity({left: '0'}, 500);
+            $('#maskLayer').css('display','block');
             panel_active = 1;
         } else {
+            $('#maskLayer').css('display','none');
             $('#panel').velocity("stop").velocity({left: '100%', 'diaplay': 'none'}, 500);
             panel_active = 0;
         }
@@ -355,7 +388,7 @@
                     }
                     $('#myfile ul').html(html);
                 } else {
-                    $('#myfile ul').html('<li>' + data.msg + '</li>');
+                    $('#myfile ul').html(data.msg);
                 }
 
             }
@@ -414,14 +447,68 @@
         play();
     });
     $('#sbtt').on('click', function () {
-        panel = 'hxpd';
+        panel = 'sbtt';
         play();
     });
     $('#rmpd').on('click', function () {
         panel = 'rmpd';
         play();
     });
+
+    //固定封面信息
+    $('#fixed').on('click', function () {
+        var $info = $('#info');
+        if ($info.hasClass('info-fix')) {
+            $info.removeClass('info-fix');
+        } else {
+            $info.addClass('info-fix');
+        }
+    });
+    //点击封面暂停
+    $('#info-img').on('click', function () {
+        $('#play').click();
+        playPauseUIButton.toggle();
+
+    });
+    //点击红心
+    $('#like').on('click', function () {
+        $.ajax({
+            type: 'get',
+            url: 'song/like/' + $(audio).data('songid'),
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                if (data.status) {
+                    if (data.count == 1) {
+                        $('#like').removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
+                    } else {
+                        $('#like').removeClass('fa-heart').addClass('fa-heart-o').css('color', 'black');
+                    }
+                } else {
+                    alert(data.msg);
+                }
+
+            }
+        });
+
+
+    });
+    //添加不喜欢
+    $('#dislike').on('click', function () {
+        $.ajax({
+            type: 'get',
+            url: 'song/dislike/' + $(audio).data('songid'),
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    play();
+                } else {
+                    alert(data.msg);
+                }
+
+            }
+        });
+    })
 </script>
-<script src="public/javascript/ctrl-btn.js"></script>
 </body>
 </html>

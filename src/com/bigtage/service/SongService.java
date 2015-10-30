@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.bigtage.bean.DisLike;
 import com.bigtage.bean.HistorySong;
 import com.bigtage.bean.Like;
 import com.bigtage.bean.Song;
@@ -33,12 +34,11 @@ public class SongService {
 		} else if ("rmpd".equals(panel)) {// 热门频道
 			songs = sDao.getSongRmpd();
 		} else {// 随便听听
-			songs = sDao.getSongs();
+			songs = sDao.getSongs(u);
 		}
 		if (songs != null && songs.size() > 0) {
-			int a = (int) (Math.random() * (songs.size() - 1));
-			System.out.println("a:" + a);
-			Song song = songs.get(a);
+			// 随机播放
+			Song song = songs.get((int) (Math.random() * (songs.size())));
 			return song;
 		}
 		return null;
@@ -92,8 +92,47 @@ public class SongService {
 		return sDao.updateLrc(songid, string);
 	}
 
-	public boolean addLike(Like like) {
-		return sDao.addLike(like);
+	/**
+	 * 添加喜欢歌曲
+	 * 
+	 * @param like
+	 * @return 1：成功添加，-1：成功取消，0：数据库失败
+	 */
+	public int addLike(Like like) {
+		// 先查找是否存在
+		if (sDao.isLike(like)) {
+			if (sDao.cancleLike(like)) {
+				return -1;
+			}
+		} else {
+			if (sDao.addLike(like)) {
+				return 1;
+			}
+		}
+		return 0;
+	}
+
+	public boolean isLike(Like like) {
+		return sDao.isLike(like);
+	}
+
+	/**
+	 * 添加不喜欢歌曲
+	 * 
+	 * @param like
+	 * @return 1：成功添加，-1：成功取消，0：数据库失败
+	 */
+	public int addDisLike(DisLike dislike) {
+		if (sDao.isDisLike(dislike)) {
+			if (sDao.cancleDisLike(dislike)) {
+				return -1;
+			}
+		} else {
+			if (sDao.addDisLike(dislike)) {
+				return 1;
+			}
+		}
+		return 0;
 	}
 
 	public boolean saveHistory(HistorySong historySong) {
@@ -101,4 +140,5 @@ public class SongService {
 		sDao.increaseSong(historySong.getSongid());
 		return sDao.saveHistory(historySong);
 	}
+
 }

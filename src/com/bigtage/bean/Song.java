@@ -113,4 +113,12 @@ public class Song {
 		this.count = count;
 	}
 
+	@Override
+	public String toString() {
+		return "Song [songid=" + songid + ", name=" + name + ", singer="
+				+ singer + ", src=" + src + ", lrc=" + lrc + ", img=" + img
+				+ ", uid=" + uid + ", uptime=" + uptime + ", count=" + count
+				+ "]";
+	}
+
 }
